@@ -39,6 +39,18 @@ public class PatientController {
         this.patientIdentifierMapper = patientIdentifierMapper;
     }
 
+    @GetMapping("/api/patient")
+    public Page<PatientListEntryDTO> getPatients(
+            @RequestParam(required = false) UUID id,
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        var patients = patientService.getPatients(id, name, pageable);
+        return patients.map(patientMapper::toListEntryDTO);
+    }
+
     @PostMapping("/api/patient")
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDTO createPatient(@Valid @RequestBody NewPatientDTO dto) {
@@ -52,12 +64,10 @@ public class PatientController {
         return patientMapper.toDTO(patient);
     }
 
-    @PostMapping("/api/patient/{id}/identifier")
-    @ResponseStatus(HttpStatus.CREATED)
-    public PatientIdentifierDTO addIdentifier(@PathVariable UUID id,
-                                               @Valid @RequestBody NewPatientIdentifierDTO dto) {
-        var identifier = patientService.addIdentifier(id, dto);
-        return patientIdentifierMapper.toDTO(identifier);
+    @DeleteMapping("/api/patient/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePatient(@PathVariable UUID id) {
+        patientService.deletePatient(id);
     }
 
     @GetMapping("/api/patient/{id}/identifier")
@@ -68,27 +78,17 @@ public class PatientController {
                 .toList();
     }
 
+    @PostMapping("/api/patient/{id}/identifier")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PatientIdentifierDTO addIdentifier(@PathVariable UUID id,
+                                               @Valid @RequestBody NewPatientIdentifierDTO dto) {
+        var identifier = patientService.addIdentifier(id, dto);
+        return patientIdentifierMapper.toDTO(identifier);
+    }
+
     @DeleteMapping("/api/patient/{id}/identifier/{identifierId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteIdentifier(@PathVariable UUID id, @PathVariable UUID identifierId) {
         patientService.deleteIdentifier(id, identifierId);
-    }
-
-    @DeleteMapping("/api/patient/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePatient(@PathVariable UUID id) {
-        patientService.deletePatient(id);
-    }
-
-    @GetMapping("/api/patient")
-    public Page<PatientListEntryDTO> getPatients(
-            @RequestParam(required = false) UUID id,
-            @RequestParam(required = false) String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        var patients = patientService.getPatients(id, name, pageable);
-        return patients.map(patientMapper::toListEntryDTO);
     }
 }
