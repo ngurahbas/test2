@@ -1,0 +1,35 @@
+@startuml
+entity Patient {
+    + **id UUID**
+    --
+    first_name
+    last_name
+    dob
+    gender
+    phone_no
+    australian_address {json}
+    status (MERGED, ACTIVE)
+}
+
+entity PatientMergeHistory {
+    + **id UUID**
+    --
+    keep_patient_id FK (indexed)
+    discard_patient_id FK (indexed)
+}
+
+PatientMergeHistory -- Patient : keep
+PatientMergeHistory -- Patient : discard
+
+entity PatientIdentifier {
+    + **id UUID**
+    --
+    IdType (MRN, National ID, Phone, Email)
+    IdValue
+    Unique(IdType, IdValue)
+    --
+    patient_id FK (indexed)
+}
+
+PatientIdentifier }-- Patient
+@enduml
