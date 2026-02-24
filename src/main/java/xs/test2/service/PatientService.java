@@ -23,10 +23,13 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final PhoneNumberService phoneNumberService;
 
-    public PatientService(PatientRepository patientRepository, PatientMapper patientMapper) {
+    public PatientService(PatientRepository patientRepository, PatientMapper patientMapper,
+                          PhoneNumberService phoneNumberService) {
         this.patientRepository = patientRepository;
         this.patientMapper = patientMapper;
+        this.phoneNumberService = phoneNumberService;
     }
 
     @Transactional
@@ -36,9 +39,12 @@ public class PatientService {
         patient.setIdentifiers(new ArrayList<>());
 
         if (dto.getPhoneNo() != null && !dto.getPhoneNo().isBlank()) {
+            String normalizedPhone = phoneNumberService.normalize(dto.getPhoneNo());
+            patient.setPhoneNo(normalizedPhone);
+
             PatientIdentifier identifier = new PatientIdentifier();
             identifier.setIdType(IdentifierType.PHONE);
-            identifier.setIdValue(dto.getPhoneNo());
+            identifier.setIdValue(normalizedPhone);
             identifier.setPatient(patient);
             patient.getIdentifiers().add(identifier);
         }
