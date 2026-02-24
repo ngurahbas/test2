@@ -3,7 +3,7 @@ package xs.test2.dto;
 import java.util.List;
 import java.util.UUID;
 
-public class PatientDTO extends NewPatientDTO {
+public class PatientDTO extends PatientRequestDTO {
 
     private UUID id;
 

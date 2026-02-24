@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import xs.test2.dto.NewPatientIdentifierDTO;
-import xs.test2.dto.NewPatientDTO;
+import xs.test2.dto.PatientRequestDTO;
 import xs.test2.dto.PatientDTO;
 import xs.test2.dto.PatientIdentifierDTO;
 import xs.test2.dto.PatientListEntryDTO;
@@ -53,7 +53,7 @@ public class PatientController {
 
     @PostMapping("/api/patient")
     @ResponseStatus(HttpStatus.CREATED)
-    public PatientDTO createPatient(@Valid @RequestBody NewPatientDTO dto) {
+    public PatientDTO createPatient(@Valid @RequestBody PatientRequestDTO dto) {
         var patient = patientService.createPatient(dto);
         return patientMapper.toDTO(patient);
     }

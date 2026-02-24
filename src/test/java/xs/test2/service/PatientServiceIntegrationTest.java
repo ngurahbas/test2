@@ -9,7 +9,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
-import xs.test2.dto.NewPatientDTO;
+import xs.test2.dto.PatientRequestDTO;
 import xs.test2.dto.NewPatientIdentifierDTO;
 import xs.test2.entity.Patient;
 import xs.test2.entity.PatientIdentifier;
@@ -50,7 +50,7 @@ class PatientServiceIntegrationTest {
     @Test
     @Transactional
     void deletePatient_cascadeDeletesIdentifiers() {
-        NewPatientDTO patientDto = new NewPatientDTO();
+        PatientRequestDTO patientDto = new PatientRequestDTO();
         patientDto.setFirstName("Test");
         patientDto.setLastName("User");
         patientDto.setGender(Gender.MALE);

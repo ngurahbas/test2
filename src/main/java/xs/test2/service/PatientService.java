@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import xs.test2.dto.NewPatientIdentifierDTO;
-import xs.test2.dto.NewPatientDTO;
+import xs.test2.dto.PatientRequestDTO;
 import xs.test2.shared.IdentifierType;
 import xs.test2.entity.Patient;
 import xs.test2.entity.PatientIdentifier;
@@ -41,7 +41,7 @@ public class PatientService {
     }
 
     @Transactional
-    public Patient createPatient(NewPatientDTO dto) {
+    public Patient createPatient(PatientRequestDTO dto) {
         Patient patient = patientMapper.toEntity(dto);
         patient.setStatus(PatientStatus.ACTIVE);
         patient.setIdentifiers(new ArrayList<>());

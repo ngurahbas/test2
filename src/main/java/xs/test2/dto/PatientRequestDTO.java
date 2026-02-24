@@ -6,7 +6,7 @@ import xs.test2.shared.Gender;
 
 import java.time.LocalDate;
 
-public class NewPatientDTO {
+public class PatientRequestDTO {
 
     @NotBlank
     private String firstName;
