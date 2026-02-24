@@ -1,6 +1,7 @@
 package xs.test2.entity;
 
 import jakarta.persistence.*;
+import xs.test2.shared.IdentifierType;
 
 import java.util.UUID;
 

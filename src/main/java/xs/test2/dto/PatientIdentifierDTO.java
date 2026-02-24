@@ -1,6 +1,6 @@
 package xs.test2.dto;
 
-import xs.test2.entity.IdentifierType;
+import xs.test2.shared.IdentifierType;
 
 import java.util.UUID;
 

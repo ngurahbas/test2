@@ -3,6 +3,8 @@ package xs.test2.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import xs.test2.shared.Gender;
+import xs.test2.shared.PatientStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

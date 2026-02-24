@@ -8,15 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import xs.test2.dto.NewPatientDTO;
-import xs.test2.entity.IdentifierType;
+import xs.test2.shared.IdentifierType;
 import xs.test2.entity.Patient;
 import xs.test2.entity.PatientIdentifier;
-import xs.test2.entity.PatientStatus;
+import xs.test2.shared.PatientStatus;
 import xs.test2.mapper.PatientMapper;
 import xs.test2.repository.PatientRepository;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
