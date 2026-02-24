@@ -151,6 +151,12 @@ public class PatientService {
                 .filter(i -> i.getId().equals(identifierId))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Identifier not found"));
+
+        if (identifier.getIdType() == IdentifierType.PHONE
+                && identifier.getIdValue().equals(patient.getPhoneNo())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete phone identifier that matches patient's phone number");
+        }
+
         patient.getIdentifiers().remove(identifier);
         patientRepository.save(patient);
     }

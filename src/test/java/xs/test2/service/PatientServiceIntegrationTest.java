@@ -14,6 +14,7 @@ import xs.test2.dto.NewPatientIdentifierDTO;
 import xs.test2.entity.Patient;
 import xs.test2.entity.PatientIdentifier;
 import xs.test2.repository.PatientRepository;
+import org.springframework.http.HttpStatus;
 import xs.test2.shared.Gender;
 import xs.test2.shared.IdentifierType;
 
@@ -78,5 +79,28 @@ class PatientServiceIntegrationTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> patientService.getIdentifiers(patientId));
         assertThat(exception.getStatusCode().value()).isEqualTo(404);
+    }
+
+    @Test
+    @Transactional
+    void deleteIdentifier_whenPhoneIdentifierMatchesPatientPhone_shouldThrowBadRequest() {
+        PatientRequestDTO patientDto = new PatientRequestDTO();
+        patientDto.setFirstName("Test");
+        patientDto.setLastName("User");
+        patientDto.setGender(Gender.MALE);
+        patientDto.setPhoneNo("0412345678");
+
+        Patient patient = patientService.createPatient(patientDto);
+        UUID patientId = patient.getId();
+
+        List<PatientIdentifier> identifiers = patientService.getIdentifiers(patientId);
+        PatientIdentifier phoneIdentifier = identifiers.stream()
+                .filter(i -> i.getIdType() == IdentifierType.PHONE)
+                .findFirst()
+                .orElseThrow();
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> patientService.deleteIdentifier(patientId, phoneIdentifier.getId()));
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }
