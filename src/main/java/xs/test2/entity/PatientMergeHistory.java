@@ -4,7 +4,13 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "patient_merge_history")
+@Table(
+    name = "patient_merge_history",
+    indexes = {
+        @Index(name = "idx_patient_merge_history_keep_patient_id", columnList = "keep_patient_id"),
+        @Index(name = "idx_patient_merge_history_discard_patient_id", columnList = "discard_patient_id")
+    }
+)
 public class PatientMergeHistory {
 
     @Id
