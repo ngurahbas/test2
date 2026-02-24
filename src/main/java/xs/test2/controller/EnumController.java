@@ -33,7 +33,7 @@ public class EnumController {
                 .map(type -> Map.of(
                         "value", type.name(),
                         "label", switch (type) {
-                            case MRN -> "Mrn";
+                            case MRN -> "Medical Record Number";
                             case NATIONAL_ID -> "National ID";
                             case PHONE -> "Phone";
                             case EMAIL -> "Email";
