@@ -63,7 +63,7 @@ class EnumControllerIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response).contains("\"value\":\"MRN\"");
-        assertThat(response).contains("\"label\":\"Mrn\"");
+        assertThat(response).contains("\"label\":\"Medical Record Number\"");
         assertThat(response).contains("\"value\":\"NATIONAL_ID\"");
         assertThat(response).contains("\"label\":\"National ID\"");
         assertThat(response).contains("\"value\":\"PHONE\"");

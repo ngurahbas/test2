@@ -90,7 +90,7 @@ class PatientControllerIntegrationTest {
         assertThat(getResponse).contains("\"lastName\":\"Doe\"");
         assertThat(getResponse).contains("\"dob\":\"1990-01-15\"");
         assertThat(getResponse).contains("\"gender\":\"MALE\"");
-        assertThat(getResponse).contains("\"phoneNo\":\"0412345678\"");
+        assertThat(getResponse).contains("\"phoneNo\":\"+61412345678\"");
         assertThat(getResponse).contains("\"address\":\"123 Main St\"");
         assertThat(getResponse).contains("\"suburb\":\"Sydney\"");
         assertThat(getResponse).contains("\"state\":\"NSW\"");
