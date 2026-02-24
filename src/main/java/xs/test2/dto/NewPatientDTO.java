@@ -1,5 +1,6 @@
 package xs.test2.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import xs.test2.entity.AustralianAddress;
 import xs.test2.entity.Gender;
 
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 
 public class NewPatientDTO {
 
+    @NotBlank
     private String firstName;
 
     private String lastName;
