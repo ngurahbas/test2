@@ -1,7 +1,5 @@
 package xs.test2.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class AustralianAddress {
 
     private String address;
