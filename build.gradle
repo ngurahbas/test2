@@ -33,14 +33,14 @@ tasks.named('test') {
 }
 
 tasks.register('buildAngular', Exec) {
-    workingDir "${projectDir}/test2-fe"
-    commandLine "bun", "run", "build"
-    outputs.dir "${projectDir}/test2-fe/dist/test2-fe/browser"
+    workingDir "${projectDir}/angular"
+    commandLine "bunx", "ng", "build"
+    outputs.dir "${projectDir}/angular/dist/angular/browser"
 }
 
 tasks.register('copyAngularAssets', Copy) {
     dependsOn buildAngular
-    from "${projectDir}/test2-fe/dist/test2-fe/browser"
+    from "${projectDir}/angular/dist/angular/browser"
     into "${projectDir}/src/main/resources/angular"
 }
 
