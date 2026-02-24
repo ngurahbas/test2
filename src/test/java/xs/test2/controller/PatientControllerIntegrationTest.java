@@ -40,7 +40,7 @@ class PatientControllerIntegrationTest {
 
     @Test
     @Order(1)
-    void createPatient_shouldReturn201() {
+    void createAndGetPatient_shouldReturn201AndPatientData() {
         restClient = RestClient.builder()
                 .defaultStatusHandler(
                         status -> status.value() >= 400,
@@ -67,23 +67,33 @@ class PatientControllerIntegrationTest {
                 }
                 """;
 
-        var response = restClient.post()
+        var createResponse = restClient.post()
                 .uri("http://localhost:%d/api/patient".formatted(port))
                 .header("Content-Type", "application/json")
                 .body(requestBody)
                 .retrieve()
                 .body(String.class);
 
-        assertThat(response).isNotNull();
-        assertThat(response).contains("\"id\"");
-        assertThat(response).contains("\"firstName\":\"John\"");
-        assertThat(response).contains("\"lastName\":\"Doe\"");
-        assertThat(response).contains("\"dob\":\"1990-01-15\"");
-        assertThat(response).contains("\"gender\":\"MALE\"");
-        assertThat(response).contains("\"phoneNo\":\"0412345678\"");
-        assertThat(response).contains("\"address\":\"123 Main St\"");
-        assertThat(response).contains("\"suburb\":\"Sydney\"");
-        assertThat(response).contains("\"state\":\"NSW\"");
-        assertThat(response).contains("\"postcode\":\"2000\"");
+        assertThat(createResponse).isNotNull();
+        assertThat(createResponse).contains("\"id\"");
+
+        String patientId = createResponse.split("\"id\":\"")[1].split("\"")[0];
+
+        var getResponse = restClient.get()
+                .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
+                .retrieve()
+                .body(String.class);
+
+        assertThat(getResponse).isNotNull();
+        assertThat(getResponse).contains("\"id\":\"%s\"".formatted(patientId));
+        assertThat(getResponse).contains("\"firstName\":\"John\"");
+        assertThat(getResponse).contains("\"lastName\":\"Doe\"");
+        assertThat(getResponse).contains("\"dob\":\"1990-01-15\"");
+        assertThat(getResponse).contains("\"gender\":\"MALE\"");
+        assertThat(getResponse).contains("\"phoneNo\":\"0412345678\"");
+        assertThat(getResponse).contains("\"address\":\"123 Main St\"");
+        assertThat(getResponse).contains("\"suburb\":\"Sydney\"");
+        assertThat(getResponse).contains("\"state\":\"NSW\"");
+        assertThat(getResponse).contains("\"postcode\":\"2000\"");
     }
 }

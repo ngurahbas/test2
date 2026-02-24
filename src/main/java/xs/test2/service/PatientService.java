@@ -2,6 +2,8 @@ package xs.test2.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import xs.test2.dto.NewPatientDTO;
 import xs.test2.entity.IdentifierType;
 import xs.test2.entity.Patient;
@@ -11,6 +13,7 @@ import xs.test2.mapper.PatientMapper;
 import xs.test2.repository.PatientRepository;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Service
 public class PatientService {
@@ -38,5 +41,10 @@ public class PatientService {
         }
 
         return patientRepository.save(patient);
+    }
+
+    public Patient getPatientById(UUID id) {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
     }
 }
