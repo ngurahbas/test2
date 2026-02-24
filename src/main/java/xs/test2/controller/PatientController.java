@@ -1,11 +1,15 @@
 package xs.test2.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import xs.test2.dto.NewPatientDTO;
@@ -37,5 +41,17 @@ public class PatientController {
     public PatientDTO getPatient(@PathVariable UUID id) {
         var patient = patientService.getPatientById(id);
         return patientMapper.toDTO(patient);
+    }
+
+    @GetMapping("/api/patient")
+    public Page<PatientDTO> getPatients(
+            @RequestParam(required = false) UUID id,
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        var patients = patientService.getPatients(id, name, pageable);
+        return patients.map(patientMapper::toDTO);
     }
 }
