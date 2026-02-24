@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import xs.test2.dto.NewPatientIdentifierDTO;
 import xs.test2.dto.NewPatientDTO;
 import xs.test2.shared.IdentifierType;
 import xs.test2.entity.Patient;
@@ -55,6 +56,24 @@ public class PatientService {
     public Patient getPatientById(UUID id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+    }
+
+    @Transactional
+    public PatientIdentifier addIdentifier(UUID patientId, NewPatientIdentifierDTO dto) {
+        Patient patient = getPatientById(patientId);
+
+        String idValue = dto.getIdValue();
+        if (dto.getIdType() == IdentifierType.PHONE && idValue != null && !idValue.isBlank()) {
+            idValue = phoneNumberService.normalize(idValue);
+        }
+
+        PatientIdentifier identifier = new PatientIdentifier();
+        identifier.setIdType(dto.getIdType());
+        identifier.setIdValue(idValue);
+        identifier.setPatient(patient);
+        patient.getIdentifiers().add(identifier);
+
+        return patientRepository.save(patient).getIdentifiers().getLast();
     }
 
     @Transactional(readOnly = true)

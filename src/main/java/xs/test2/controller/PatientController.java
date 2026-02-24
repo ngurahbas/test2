@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import xs.test2.dto.NewPatientIdentifierDTO;
 import xs.test2.dto.NewPatientDTO;
 import xs.test2.dto.PatientDTO;
+import xs.test2.dto.PatientIdentifierDTO;
 import xs.test2.dto.PatientListEntryDTO;
+import xs.test2.mapper.PatientIdentifierMapper;
 import xs.test2.mapper.PatientMapper;
 import xs.test2.service.PatientService;
 
@@ -25,10 +28,13 @@ public class PatientController {
 
     private final PatientService patientService;
     private final PatientMapper patientMapper;
+    private final PatientIdentifierMapper patientIdentifierMapper;
 
-    public PatientController(PatientService patientService, PatientMapper patientMapper) {
+    public PatientController(PatientService patientService, PatientMapper patientMapper,
+                            PatientIdentifierMapper patientIdentifierMapper) {
         this.patientService = patientService;
         this.patientMapper = patientMapper;
+        this.patientIdentifierMapper = patientIdentifierMapper;
     }
 
     @PostMapping("/api/patient")
@@ -42,6 +48,14 @@ public class PatientController {
     public PatientDTO getPatient(@PathVariable UUID id) {
         var patient = patientService.getPatientById(id);
         return patientMapper.toDTO(patient);
+    }
+
+    @PostMapping("/api/patient/{id}/identifier")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PatientIdentifierDTO addIdentifier(@PathVariable UUID id,
+                                               @Valid @RequestBody NewPatientIdentifierDTO dto) {
+        var identifier = patientService.addIdentifier(id, dto);
+        return patientIdentifierMapper.toDTO(identifier);
     }
 
     @GetMapping("/api/patient")

@@ -1,16 +1,10 @@
 package xs.test2.dto;
 
-import xs.test2.shared.IdentifierType;
-
 import java.util.UUID;
 
-public class PatientIdentifierDTO {
+public class PatientIdentifierDTO extends NewPatientIdentifierDTO {
 
     private UUID id;
-
-    private IdentifierType idType;
-
-    private String idValue;
 
     public UUID getId() {
         return id;
@@ -18,21 +12,5 @@ public class PatientIdentifierDTO {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public IdentifierType getIdType() {
-        return idType;
-    }
-
-    public void setIdType(IdentifierType idType) {
-        this.idType = idType;
-    }
-
-    public String getIdValue() {
-        return idValue;
-    }
-
-    public void setIdValue(String idValue) {
-        this.idValue = idValue;
     }
 }

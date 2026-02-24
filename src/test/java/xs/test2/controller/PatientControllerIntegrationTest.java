@@ -40,7 +40,7 @@ class PatientControllerIntegrationTest {
 
     @Test
     @Order(1)
-    void createAndGetPatient_shouldReturn201AndPatientData() {
+    void createPatientAddIdentifierAndGet_shouldReturn201AndPatientData() {
         restClient = RestClient.builder()
                 .defaultStatusHandler(
                         status -> status.value() >= 400,
@@ -79,6 +79,24 @@ class PatientControllerIntegrationTest {
 
         String patientId = createResponse.split("\"id\":\"")[1].split("\"")[0];
 
+        String identifierRequestBody = """
+                {
+                    "idType": "EMAIL",
+                    "idValue": "john.doe@example.com"
+                }
+                """;
+
+        var addIdentifierResponse = restClient.post()
+                .uri("http://localhost:%d/api/patient/%s/identifier".formatted(port, patientId))
+                .header("Content-Type", "application/json")
+                .body(identifierRequestBody)
+                .retrieve()
+                .body(String.class);
+
+        assertThat(addIdentifierResponse).isNotNull();
+        assertThat(addIdentifierResponse).contains("\"idType\":\"EMAIL\"");
+        assertThat(addIdentifierResponse).contains("\"idValue\":\"john.doe@example.com\"");
+
         var getResponse = restClient.get()
                 .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
                 .retrieve()
@@ -95,5 +113,7 @@ class PatientControllerIntegrationTest {
         assertThat(getResponse).contains("\"suburb\":\"Sydney\"");
         assertThat(getResponse).contains("\"state\":\"NSW\"");
         assertThat(getResponse).contains("\"postcode\":\"2000\"");
+        assertThat(getResponse).contains("\"idType\":\"EMAIL\"");
+        assertThat(getResponse).contains("\"idValue\":\"john.doe@example.com\"");
     }
 }
