@@ -17,6 +17,7 @@ import xs.test2.mapper.PatientMapper;
 import xs.test2.repository.PatientRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,6 +32,12 @@ public class PatientService {
         this.patientRepository = patientRepository;
         this.patientMapper = patientMapper;
         this.phoneNumberService = phoneNumberService;
+    }
+
+    @Transactional
+    public void deletePatient(UUID id) {
+        Patient patient = getPatientById(id);
+        patientRepository.delete(patient);
     }
 
     @Transactional
@@ -89,5 +96,21 @@ public class PatientService {
         }
 
         return patientRepository.findAll(pageable);
+    }
+
+    public List<PatientIdentifier> getIdentifiers(UUID patientId) {
+        Patient patient = getPatientById(patientId);
+        return new ArrayList<>(patient.getIdentifiers());
+    }
+
+    @Transactional
+    public void deleteIdentifier(UUID patientId, UUID identifierId) {
+        Patient patient = getPatientById(patientId);
+        PatientIdentifier identifier = patient.getIdentifiers().stream()
+                .filter(i -> i.getId().equals(identifierId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Identifier not found"));
+        patient.getIdentifiers().remove(identifier);
+        patientRepository.save(patient);
     }
 }

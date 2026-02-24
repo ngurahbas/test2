@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import xs.test2.mapper.PatientIdentifierMapper;
 import xs.test2.mapper.PatientMapper;
 import xs.test2.service.PatientService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -56,6 +58,26 @@ public class PatientController {
                                                @Valid @RequestBody NewPatientIdentifierDTO dto) {
         var identifier = patientService.addIdentifier(id, dto);
         return patientIdentifierMapper.toDTO(identifier);
+    }
+
+    @GetMapping("/api/patient/{id}/identifier")
+    public List<PatientIdentifierDTO> getIdentifiers(@PathVariable UUID id) {
+        var identifiers = patientService.getIdentifiers(id);
+        return identifiers.stream()
+                .map(patientIdentifierMapper::toDTO)
+                .toList();
+    }
+
+    @DeleteMapping("/api/patient/{id}/identifier/{identifierId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteIdentifier(@PathVariable UUID id, @PathVariable UUID identifierId) {
+        patientService.deleteIdentifier(id, identifierId);
+    }
+
+    @DeleteMapping("/api/patient/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePatient(@PathVariable UUID id) {
+        patientService.deletePatient(id);
     }
 
     @GetMapping("/api/patient")

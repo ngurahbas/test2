@@ -116,4 +116,89 @@ class PatientControllerIntegrationTest {
         assertThat(getResponse).contains("\"idType\":\"EMAIL\"");
         assertThat(getResponse).contains("\"idValue\":\"john.doe@example.com\"");
     }
+
+    @Test
+    void deletePatientFlow_shouldDeleteIdentifierAndPatient() {
+        var localRestClient = RestClient.builder()
+                .defaultStatusHandler(
+                        status -> status.value() >= 400,
+                        (request, response) -> {
+                            String body = new String(response.getBody().readAllBytes());
+                            System.err.println("Error response: " + response.getStatusCode() + " - " + body);
+                        }
+                )
+                .build();
+
+        String createRequestBody = """
+                {
+                    "firstName": "Jane",
+                    "lastName": "Smith",
+                    "dob": "1985-06-20",
+                    "gender": "FEMALE"
+                }
+                """;
+
+        var createResponse = localRestClient.post()
+                .uri("http://localhost:%d/api/patient".formatted(port))
+                .header("Content-Type", "application/json")
+                .body(createRequestBody)
+                .retrieve()
+                .body(String.class);
+
+        assertThat(createResponse).isNotNull();
+        assertThat(createResponse).contains("\"id\"");
+
+        String patientId = createResponse.split("\"id\":\"")[1].split("\"")[0];
+
+        String identifierRequestBody = """
+                {
+                    "idType": "EMAIL",
+                    "idValue": "jane.smith@example.com"
+                }
+                """;
+
+        var addIdentifierResponse = localRestClient.post()
+                .uri("http://localhost:%d/api/patient/%s/identifier".formatted(port, patientId))
+                .header("Content-Type", "application/json")
+                .body(identifierRequestBody)
+                .retrieve()
+                .body(String.class);
+
+        assertThat(addIdentifierResponse).isNotNull();
+        String identifierId = addIdentifierResponse.split("\"id\":\"")[1].split("\"")[0];
+
+        var getResponse = localRestClient.get()
+                .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
+                .retrieve()
+                .body(String.class);
+
+        assertThat(getResponse).isNotNull();
+        assertThat(getResponse).contains("\"idType\":\"EMAIL\"");
+        assertThat(getResponse).contains("\"idValue\":\"jane.smith@example.com\"");
+
+        localRestClient.delete()
+                .uri("http://localhost:%d/api/patient/%s/identifier/%s".formatted(port, patientId, identifierId))
+                .retrieve()
+                .toBodilessEntity();
+
+        localRestClient.delete()
+                .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
+                .retrieve()
+                .toBodilessEntity();
+
+        var notFoundClient = RestClient.builder()
+                .defaultStatusHandler(
+                        status -> status.is4xxClientError(),
+                        (request, response) -> {
+                        }
+                )
+                .build();
+
+        var getDeletedResponse = notFoundClient.get()
+                .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
+                .retrieve()
+                .toBodilessEntity();
+
+        assertThat(getDeletedResponse.getStatusCode().value()).isEqualTo(404);
+    }
 }
