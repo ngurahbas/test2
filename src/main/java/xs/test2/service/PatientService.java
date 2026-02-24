@@ -76,7 +76,6 @@ public class PatientService {
         return patientRepository.save(patient).getIdentifiers().getLast();
     }
 
-    @Transactional(readOnly = true)
     public Page<Patient> getPatients(UUID id, String name, Pageable pageable) {
         if (id != null) {
             return patientRepository.findById(id)
