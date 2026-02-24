@@ -104,6 +104,47 @@ public class PatientService {
     }
 
     @Transactional
+    public Patient updatePatient(UUID id, PatientRequestDTO dto) {
+        Patient patient = getPatientById(id);
+
+        patient.setFirstName(dto.getFirstName());
+        patient.setLastName(dto.getLastName());
+        patient.setDob(dto.getDob());
+        patient.setGender(dto.getGender());
+        patient.setAustralianAddress(dto.getAustralianAddress());
+
+        String oldPhone = patient.getPhoneNo();
+        String newPhone = dto.getPhoneNo();
+        String normalizedNewPhone = null;
+
+        if (newPhone != null && !newPhone.isBlank()) {
+            normalizedNewPhone = phoneNumberService.normalize(newPhone);
+        }
+
+        boolean phoneChanged = (oldPhone == null && normalizedNewPhone != null)
+                || (oldPhone != null && !oldPhone.equals(normalizedNewPhone));
+
+        if (phoneChanged) {
+            patient.setPhoneNo(normalizedNewPhone);
+
+            patient.getIdentifiers().stream()
+                    .filter(i -> i.getIdType() == IdentifierType.PHONE)
+                    .findFirst()
+                    .ifPresent(patient.getIdentifiers()::remove);
+
+            if (normalizedNewPhone != null) {
+                PatientIdentifier identifier = new PatientIdentifier();
+                identifier.setIdType(IdentifierType.PHONE);
+                identifier.setIdValue(normalizedNewPhone);
+                identifier.setPatient(patient);
+                patient.getIdentifiers().add(identifier);
+            }
+        }
+
+        return patientRepository.save(patient);
+    }
+
+    @Transactional
     public void deleteIdentifier(UUID patientId, UUID identifierId) {
         Patient patient = getPatientById(patientId);
         PatientIdentifier identifier = patient.getIdentifiers().stream()

@@ -97,6 +97,32 @@ class PatientControllerIntegrationTest {
         assertThat(addIdentifierResponse).contains("\"idType\":\"EMAIL\"");
         assertThat(addIdentifierResponse).contains("\"idValue\":\"john.doe@example.com\"");
 
+        String updateRequestBody = """
+                {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "dob": "1990-01-15",
+                    "gender": "MALE",
+                    "phoneNo": "0498765432",
+                    "australianAddress": {
+                        "address": "123 Main St",
+                        "suburb": "Sydney",
+                        "state": "NSW",
+                        "postcode": "2000"
+                    }
+                }
+                """;
+
+        var updateResponse = restClient.put()
+                .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
+                .header("Content-Type", "application/json")
+                .body(updateRequestBody)
+                .retrieve()
+                .body(String.class);
+
+        assertThat(updateResponse).isNotNull();
+        assertThat(updateResponse).contains("\"phoneNo\":\"+61498765432\"");
+
         var getResponse = restClient.get()
                 .uri("http://localhost:%d/api/patient/%s".formatted(port, patientId))
                 .retrieve()
@@ -108,13 +134,16 @@ class PatientControllerIntegrationTest {
         assertThat(getResponse).contains("\"lastName\":\"Doe\"");
         assertThat(getResponse).contains("\"dob\":\"1990-01-15\"");
         assertThat(getResponse).contains("\"gender\":\"MALE\"");
-        assertThat(getResponse).contains("\"phoneNo\":\"+61412345678\"");
+        assertThat(getResponse).contains("\"phoneNo\":\"+61498765432\"");
         assertThat(getResponse).contains("\"address\":\"123 Main St\"");
         assertThat(getResponse).contains("\"suburb\":\"Sydney\"");
         assertThat(getResponse).contains("\"state\":\"NSW\"");
         assertThat(getResponse).contains("\"postcode\":\"2000\"");
         assertThat(getResponse).contains("\"idType\":\"EMAIL\"");
         assertThat(getResponse).contains("\"idValue\":\"john.doe@example.com\"");
+        assertThat(getResponse).contains("\"idType\":\"PHONE\"");
+        assertThat(getResponse).contains("\"idValue\":\"+61498765432\"");
+        assertThat(getResponse).doesNotContain("\"idValue\":\"+61412345678\"");
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -55,6 +56,12 @@ public class PatientController {
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDTO createPatient(@Valid @RequestBody PatientRequestDTO dto) {
         var patient = patientService.createPatient(dto);
+        return patientMapper.toDTO(patient);
+    }
+
+    @PutMapping("/api/patient/{id}")
+    public PatientDTO updatePatient(@PathVariable UUID id, @Valid @RequestBody PatientRequestDTO dto) {
+        var patient = patientService.updatePatient(id, dto);
         return patientMapper.toDTO(patient);
     }
 
