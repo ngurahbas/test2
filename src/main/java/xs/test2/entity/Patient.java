@@ -17,23 +17,19 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(nullable = false)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "dob", nullable = false)
     private LocalDate dob;
 
-    @Column(nullable = false)
     private String gender;
 
-    @Column(name = "phone_no")
     private String phoneNo;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "australian_address", columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private AustralianAddress australianAddress;
 
     @Enumerated(EnumType.STRING)
