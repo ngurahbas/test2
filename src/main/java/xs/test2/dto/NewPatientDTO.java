@@ -1,6 +1,7 @@
 package xs.test2.dto;
 
 import xs.test2.entity.AustralianAddress;
+import xs.test2.entity.Gender;
 
 import java.time.LocalDate;
 
@@ -12,7 +13,7 @@ public class NewPatientDTO {
 
     private LocalDate dob;
 
-    private String gender;
+    private Gender gender;
 
     private String phoneNo;
 
@@ -42,11 +43,11 @@ public class NewPatientDTO {
         this.dob = dob;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 

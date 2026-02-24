@@ -24,7 +24,8 @@ public class Patient {
 
     private LocalDate dob;
 
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     private String phoneNo;
 
@@ -77,11 +78,11 @@ public class Patient {
         this.dob = dob;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
