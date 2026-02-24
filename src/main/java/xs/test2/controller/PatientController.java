@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import xs.test2.dto.NewPatientDTO;
 import xs.test2.dto.PatientDTO;
+import xs.test2.dto.PatientListEntryDTO;
 import xs.test2.mapper.PatientMapper;
 import xs.test2.service.PatientService;
 
@@ -44,7 +45,7 @@ public class PatientController {
     }
 
     @GetMapping("/api/patient")
-    public Page<PatientDTO> getPatients(
+    public Page<PatientListEntryDTO> getPatients(
             @RequestParam(required = false) UUID id,
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
@@ -52,6 +53,6 @@ public class PatientController {
 
         Pageable pageable = PageRequest.of(page, size);
         var patients = patientService.getPatients(id, name, pageable);
-        return patients.map(patientMapper::toDTO);
+        return patients.map(patientMapper::toListEntryDTO);
     }
 }

@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import xs.test2.dto.NewPatientDTO;
 import xs.test2.dto.PatientDTO;
+import xs.test2.dto.PatientListEntryDTO;
 import xs.test2.entity.Patient;
 
 @Mapper(componentModel = "spring", uses = PatientIdentifierMapper.class)
@@ -18,4 +19,6 @@ public interface PatientMapper {
 
     @Mapping(target = "identifiers", source = "identifiers")
     PatientDTO toDTO(Patient patient);
+
+    PatientListEntryDTO toListEntryDTO(Patient patient);
 }
