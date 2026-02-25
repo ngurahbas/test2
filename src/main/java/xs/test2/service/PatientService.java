@@ -23,6 +23,7 @@ import xs.test2.repository.PatientRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -181,16 +182,19 @@ public class PatientService {
             normalizedNewPhone = phoneNumberService.normalize(newPhone);
         }
 
-        boolean phoneChanged = (oldPhone == null && normalizedNewPhone != null)
-                || (oldPhone != null && !oldPhone.equals(normalizedNewPhone));
+        boolean phoneChanged = !Objects.equals(oldPhone, normalizedNewPhone);
 
         if (phoneChanged) {
             patient.setPhoneNo(normalizedNewPhone);
 
-            patient.getIdentifiers().stream()
-                    .filter(i -> i.getIdType() == IdentifierType.PHONE)
-                    .findFirst()
-                    .ifPresent(patient.getIdentifiers()::remove);
+            Iterator<PatientIdentifier> phoneIterator = patient.getIdentifiers().iterator();
+            while (phoneIterator.hasNext()) {
+                PatientIdentifier i = phoneIterator.next();
+                if (i.getIdType() == IdentifierType.PHONE && (i.getIdValue().equals(oldPhone) || i.getIdValue().equals(normalizedNewPhone))) {
+                    phoneIterator.remove();
+                    break;
+                }
+            }
 
             if (normalizedNewPhone != null) {
                 PatientIdentifier identifier = new PatientIdentifier();
@@ -208,14 +212,17 @@ public class PatientService {
                 .orElse(null);
         String newEmail = dto.getEmail();
 
-        boolean emailChanged = (oldEmail == null && newEmail != null && !newEmail.isBlank())
-                || (oldEmail != null && !oldEmail.equals(newEmail));
+        boolean emailChanged = !Objects.equals(oldEmail, newEmail);
 
         if (emailChanged) {
-            patient.getIdentifiers().stream()
-                    .filter(i -> i.getIdType() == IdentifierType.EMAIL)
-                    .findFirst()
-                    .ifPresent(patient.getIdentifiers()::remove);
+            Iterator<PatientIdentifier> emailIterator = patient.getIdentifiers().iterator();
+            while (emailIterator.hasNext()) {
+                PatientIdentifier i = emailIterator.next();
+                if (i.getIdType() == IdentifierType.EMAIL && (i.getIdValue().equals(oldEmail) || i.getIdValue().equals(newEmail))) {
+                    emailIterator.remove();
+                    break;
+                }
+            }
 
             if (newEmail != null && !newEmail.isBlank()) {
                 PatientIdentifier identifier = new PatientIdentifier();

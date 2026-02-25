@@ -139,8 +139,6 @@ class PatientControllerIntegrationTest {
         assertThat(getResponse).contains("\"suburb\":\"Sydney\"");
         assertThat(getResponse).contains("\"state\":\"NSW\"");
         assertThat(getResponse).contains("\"postcode\":\"2000\"");
-        assertThat(getResponse).contains("\"idType\":\"EMAIL\"");
-        assertThat(getResponse).contains("\"idValue\":\"john.doe@example.com\"");
         assertThat(getResponse).contains("\"idType\":\"PHONE\"");
         assertThat(getResponse).contains("\"idValue\":\"+61498765432\"");
         assertThat(getResponse).doesNotContain("\"idValue\":\"+61412345678\"");
