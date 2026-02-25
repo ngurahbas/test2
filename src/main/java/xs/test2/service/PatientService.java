@@ -216,6 +216,11 @@ public class PatientService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete phone identifier that matches patient's phone number");
         }
 
+        if (identifier.getIdType() == IdentifierType.EMAIL
+                && identifier.getIdValue().equals(patient.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete email identifier that matches patient's email");
+        }
+
         patient.getIdentifiers().remove(identifier);
         patientRepository.save(patient);
     }
