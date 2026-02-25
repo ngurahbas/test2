@@ -8,12 +8,12 @@
 
 1. Start the database:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 2. Build and run the application:
    ```bash
-   ./gradlew bootRun
+   ./gradlew clean bootRun
    ```
 
 3. Access the application:
