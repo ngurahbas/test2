@@ -13,6 +13,8 @@ public class PatientListEntryDTO {
 
     private LocalDate dob;
 
+    private String email;
+
     public UUID getId() {
         return id;
     }
@@ -43,5 +45,13 @@ public class PatientListEntryDTO {
 
     public void setDob(LocalDate dob) {
         this.dob = dob;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -7,6 +7,7 @@ export interface PatientListEntry {
   firstName: string;
   lastName: string;
   dob: string | null;
+  email: string | null;
 }
 
 export interface PatientPage {
@@ -25,6 +26,7 @@ export interface PatientRequest {
   dob?: string;
   gender?: 'MALE' | 'FEMALE' | 'OTHER';
   phoneNo?: string;
+  email?: string;
   australianAddress?: {
     address: string;
     suburb: string;

@@ -52,6 +52,7 @@ import { AddPatientDialogComponent } from './add-patient-dialog.component';
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">First Name</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Last Name</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Date of Birth</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
                 <th class="px-4 py-3 text-right text-sm font-semibold text-gray-600">Actions</th>
               </tr>
             </thead>
@@ -69,6 +70,7 @@ import { AddPatientDialogComponent } from './add-patient-dialog.component';
                   <td class="px-4 py-3 text-sm text-gray-800">{{ patient.firstName }}</td>
                   <td class="px-4 py-3 text-sm text-gray-800">{{ patient.lastName }}</td>
                   <td class="px-4 py-3 text-sm text-gray-600">{{ patient.dob || '-' }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-600">{{ patient.email || '-' }}</td>
                   <td class="px-4 py-3 text-right">
                     <button
                       (click)="deletePatient(patient.id)"
@@ -80,7 +82,7 @@ import { AddPatientDialogComponent } from './add-patient-dialog.component';
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                  <td colspan="6" class="px-4 py-8 text-center text-gray-500">
                     No patients found
                   </td>
                 </tr>

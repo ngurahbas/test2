@@ -31,6 +31,8 @@ public class Patient {
 
     private String phoneNo;
 
+    private String email;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private AustralianAddress australianAddress;
@@ -94,6 +96,14 @@ public class Patient {
 
     public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public AustralianAddress getAustralianAddress() {

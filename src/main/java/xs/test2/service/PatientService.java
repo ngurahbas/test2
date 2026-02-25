@@ -12,12 +12,17 @@ import xs.test2.dto.PatientRequestDTO;
 import xs.test2.shared.IdentifierType;
 import xs.test2.entity.Patient;
 import xs.test2.entity.PatientIdentifier;
+import xs.test2.shared.MatchScore;
+import xs.test2.shared.MatchValue;
 import xs.test2.shared.PatientStatus;
 import xs.test2.mapper.PatientMapper;
 import xs.test2.repository.PatientRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -57,7 +62,35 @@ public class PatientService {
             patient.getIdentifiers().add(identifier);
         }
 
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            PatientIdentifier identifier = new PatientIdentifier();
+            identifier.setIdType(IdentifierType.EMAIL);
+            identifier.setIdValue(dto.getEmail());
+            identifier.setPatient(patient);
+            patient.getIdentifiers().add(identifier);
+        }
+
         return patientRepository.save(patient);
+    }
+
+    public void autoMatchPatient(Patient patient) {
+//        Iterable<Patient> matchingPatients = patientRepository.getMatchingPatients(patient.getId());
+//        for (Patient matchingPatient : matchingPatients) {
+//            MatchScore score = MatchScore.NO_MATCH;
+//            Set<MatchValue> matchValues = new HashSet<>();
+//
+//            if (Objects.equals(matchingPatient.getFirstName(), patient.getFirstName()) && Objects.equals(matchingPatient.getLastName(), patient.getLastName())) {
+//                matchValues.add(MatchValue.NAME);
+//            }
+//
+//            if (Objects.equals(matchingPatient.getDob(), patient.getDob())) {
+//                matchValues.add(MatchValue.DOB);
+//            }
+//
+//            if (Objects.equals(matchingPatient.getPhoneNo(), patient.getPhoneNo())) {
+//                matchValues.add(MatchValue.PHONE);
+//            }
+//        }
     }
 
     public Patient getPatientById(UUID id) {
@@ -111,6 +144,7 @@ public class PatientService {
         patient.setLastName(dto.getLastName());
         patient.setDob(dto.getDob());
         patient.setGender(dto.getGender());
+        patient.setEmail(dto.getEmail());
         patient.setAustralianAddress(dto.getAustralianAddress());
 
         String oldPhone = patient.getPhoneNo();
@@ -136,6 +170,31 @@ public class PatientService {
                 PatientIdentifier identifier = new PatientIdentifier();
                 identifier.setIdType(IdentifierType.PHONE);
                 identifier.setIdValue(normalizedNewPhone);
+                identifier.setPatient(patient);
+                patient.getIdentifiers().add(identifier);
+            }
+        }
+
+        String oldEmail = patient.getIdentifiers().stream()
+                .filter(i -> i.getIdType() == IdentifierType.EMAIL)
+                .map(PatientIdentifier::getIdValue)
+                .findFirst()
+                .orElse(null);
+        String newEmail = dto.getEmail();
+
+        boolean emailChanged = (oldEmail == null && newEmail != null && !newEmail.isBlank())
+                || (oldEmail != null && !oldEmail.equals(newEmail));
+
+        if (emailChanged) {
+            patient.getIdentifiers().stream()
+                    .filter(i -> i.getIdType() == IdentifierType.EMAIL)
+                    .findFirst()
+                    .ifPresent(patient.getIdentifiers()::remove);
+
+            if (newEmail != null && !newEmail.isBlank()) {
+                PatientIdentifier identifier = new PatientIdentifier();
+                identifier.setIdType(IdentifierType.EMAIL);
+                identifier.setIdValue(newEmail);
                 identifier.setPatient(patient);
                 patient.getIdentifiers().add(identifier);
             }

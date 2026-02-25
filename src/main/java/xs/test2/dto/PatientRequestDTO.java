@@ -1,6 +1,7 @@
 package xs.test2.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import xs.test2.entity.AustralianAddress;
 import xs.test2.shared.Gender;
 
@@ -18,6 +19,9 @@ public class PatientRequestDTO {
     private Gender gender;
 
     private String phoneNo;
+
+    @Email
+    private String email;
 
     private AustralianAddress australianAddress;
 
@@ -59,6 +63,14 @@ public class PatientRequestDTO {
 
     public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public AustralianAddress getAustralianAddress() {
