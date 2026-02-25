@@ -58,7 +58,14 @@ import { AddPatientDialogComponent } from './add-patient-dialog.component';
             <tbody>
               @for (patient of patients(); track patient.id) {
                 <tr class="border-t hover:bg-gray-50">
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ patient.id }}</td>
+                  <td class="px-4 py-3 text-sm">
+                    <button
+                      (click)="selectedPatientId.set(patient.id); showDialog.set(true)"
+                      class="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {{ patient.id }}
+                    </button>
+                  </td>
                   <td class="px-4 py-3 text-sm text-gray-800">{{ patient.firstName }}</td>
                   <td class="px-4 py-3 text-sm text-gray-800">{{ patient.lastName }}</td>
                   <td class="px-4 py-3 text-sm text-gray-600">{{ patient.dob || '-' }}</td>
@@ -116,7 +123,8 @@ import { AddPatientDialogComponent } from './add-patient-dialog.component';
 
       @if (showDialog()) {
         <app-add-patient-dialog
-          (close)="showDialog.set(false)"
+          [patientId]="selectedPatientId() ?? undefined"
+          (close)="showDialog.set(false); selectedPatientId.set(null)"
           (saved)="onPatientSaved()"
         />
       }
@@ -128,6 +136,7 @@ export class PatientListComponent {
 
   patients = signal<PatientListEntry[]>([]);
   showDialog = signal(false);
+  selectedPatientId = signal<string | null>(null);
   searchType = signal<'id' | 'name'>('name');
   searchValue = '';
 

@@ -33,6 +33,10 @@ export interface PatientRequest {
   };
 }
 
+export interface PatientResponse extends PatientRequest {
+  id: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -66,5 +70,13 @@ export class PatientService {
 
   deletePatient(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getPatient(id: string): Observable<PatientResponse> {
+    return this.http.get<PatientResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  updatePatient(id: string, data: PatientRequest): Observable<PatientResponse> {
+    return this.http.put<PatientResponse>(`${this.baseUrl}/${id}`, data);
   }
 }

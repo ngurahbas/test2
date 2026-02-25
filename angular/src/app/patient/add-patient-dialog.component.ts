@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Output, Input, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PatientService, PatientRequest } from './patient.service';
+import { PatientService, PatientRequest, PatientResponse } from './patient.service';
 
 @Component({
   selector: 'app-add-patient-dialog',
@@ -11,7 +11,7 @@ import { PatientService, PatientRequest } from './patient.service';
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div class="flex justify-between items-center p-4 border-b">
-          <h2 class="text-lg font-semibold">Add New Patient</h2>
+          <h2 class="text-lg font-semibold">{{ mode() === 'edit' ? 'Edit Patient' : 'Add New Patient' }}</h2>
           <button (click)="close.emit()" class="text-gray-500 hover:text-gray-700">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -19,7 +19,10 @@ import { PatientService, PatientRequest } from './patient.service';
           </button>
         </div>
 
-        <form (ngSubmit)="save()" class="p-4 space-y-4">
+        @if (loading()) {
+          <div class="p-8 text-center text-gray-500">Loading...</div>
+        } @else {
+          <form (ngSubmit)="save()" class="p-4 space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
             <input
@@ -133,17 +136,21 @@ import { PatientService, PatientRequest } from './patient.service';
             </button>
           </div>
         </form>
+        }
       </div>
     </div>
   `
 })
-export class AddPatientDialogComponent {
+export class AddPatientDialogComponent implements OnInit {
   private patientService = inject(PatientService);
 
+  @Input() patientId?: string;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
+  mode = signal<'add' | 'edit'>('add');
   saving = signal(false);
+  loading = signal(false);
   error = signal<string | null>(null);
 
   form: PatientRequest = {
@@ -159,6 +166,35 @@ export class AddPatientDialogComponent {
       postcode: ''
     }
   };
+
+  ngOnInit() {
+    if (this.patientId) {
+      this.mode.set('edit');
+      this.loading.set(true);
+      this.patientService.getPatient(this.patientId).subscribe({
+        next: (patient) => {
+          this.form = {
+            firstName: patient.firstName,
+            lastName: patient.lastName || '',
+            dob: patient.dob || '',
+            gender: patient.gender,
+            phoneNo: patient.phoneNo || '',
+            australianAddress: patient.australianAddress || {
+              address: '',
+              suburb: '',
+              state: '',
+              postcode: ''
+            }
+          };
+          this.loading.set(false);
+        },
+        error: () => {
+          this.error.set('Failed to load patient');
+          this.loading.set(false);
+        }
+      });
+    }
+  }
 
   save() {
     if (!this.form.firstName?.trim()) {
@@ -183,7 +219,11 @@ export class AddPatientDialogComponent {
       } : undefined
     };
 
-    this.patientService.createPatient(data).subscribe({
+    const operation = this.mode() === 'edit' && this.patientId
+      ? this.patientService.updatePatient(this.patientId, data)
+      : this.patientService.createPatient(data);
+
+    operation.subscribe({
       next: () => {
         this.saving.set(false);
         this.saved.emit();
