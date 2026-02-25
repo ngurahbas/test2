@@ -26,7 +26,6 @@ entity PatientIdentifier {
     --
     IdType (MRN, National ID, Phone, Email)
     IdValue
-    Unique(IdType, IdValue)
     --
     patient_id FK (indexed)
 }
