@@ -17,11 +17,11 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
     Page<Patient> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
             String firstName, String lastName, Pageable pageable);
 
-    @Query("SELECT p FROM Patient p WHERE p.id != :id " +
-           "AND ((:firstName IS NOT NULL AND :lastName IS NOT NULL AND p.firstName = :firstName AND p.lastName = :lastName) " +
-           "OR (:dob IS NOT NULL AND p.dob = :dob) " +
+    @Query(value = "SELECT * FROM patient p WHERE p.id != :id " +
+           "AND ((:firstName IS NOT NULL AND :lastName IS NOT NULL AND p.first_name = :firstName AND p.last_name = :lastName) " +
+           "OR (CAST(:dob AS DATE) IS NOT NULL AND p.dob = CAST(:dob AS DATE)) " +
            "OR (:email IS NOT NULL AND p.email = :email) " +
-           "OR (:phoneNo IS NOT NULL AND p.phoneNo = :phoneNo))")
+           "OR (:phoneNo IS NOT NULL AND p.phone_no = :phoneNo))", nativeQuery = true)
     Iterable<Patient> getMatchingPatients(@Param("id") UUID id,
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,

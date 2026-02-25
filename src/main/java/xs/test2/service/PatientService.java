@@ -21,8 +21,10 @@ import xs.test2.mapper.PatientMapper;
 import xs.test2.repository.PatientRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -77,7 +79,8 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    public void autoMatchPatient(Patient patient) {
+    public Map<UUID, MatchScore> autoMatchPatient(Patient patient) {
+        Map<UUID, MatchScore> results = new HashMap<>();
         Iterable<Patient> matchingPatients = patientRepository.getMatchingPatients(
                 patient.getId(),
                 patient.getFirstName(),
@@ -110,8 +113,10 @@ public class PatientService {
             } else if (matchValues.size() > 1) {
                 score = MatchScore.REVIEW;
             }
+            results.put(matchingPatient.getId(), score);
             log.info("Patient {} matched with {} ({})", patient.getId(), matchingPatient.getId(), score);
         }
+        return results;
     }
 
     public Patient getPatientById(UUID id) {

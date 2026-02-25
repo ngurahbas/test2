@@ -17,8 +17,11 @@ import xs.test2.repository.PatientRepository;
 import org.springframework.http.HttpStatus;
 import xs.test2.shared.Gender;
 import xs.test2.shared.IdentifierType;
+import xs.test2.shared.MatchScore;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -102,5 +105,61 @@ class PatientServiceIntegrationTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> patientService.deleteIdentifier(patientId, phoneIdentifier.getId()));
         assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    @Transactional
+    void autoMatchPatient_whenPatientHasMatchingRecords_shouldReturnCorrectMatchScore() {
+        PatientRequestDTO patientX = new PatientRequestDTO();
+        patientX.setFirstName("John");
+        patientX.setLastName("Smith");
+        patientX.setDob(LocalDate.of(1990, 1, 1));
+        patientX.setGender(Gender.MALE);
+        patientX.setEmail("john@test.com");
+        patientX.setPhoneNo("0411111111");
+        Patient x = patientService.createPatient(patientX);
+
+        PatientRequestDTO patientY = new PatientRequestDTO();
+        patientY.setFirstName("Jane");
+        patientY.setLastName("Doe");
+        patientY.setDob(LocalDate.of(1985, 5, 15));
+        patientY.setGender(Gender.FEMALE);
+        patientY.setEmail("jane@test.com");
+        patientY.setPhoneNo("0422222222");
+        patientService.createPatient(patientY);
+
+        PatientRequestDTO patientZ = new PatientRequestDTO();
+        patientZ.setFirstName("Bob");
+        patientZ.setLastName("Brown");
+        patientZ.setDob(LocalDate.of(1992, 3, 20));
+        patientZ.setGender(Gender.MALE);
+        patientZ.setEmail("bob@test.com");
+        patientZ.setPhoneNo("0433333333");
+        Patient z = patientService.createPatient(patientZ);
+
+        PatientRequestDTO patientW = new PatientRequestDTO();
+        patientW.setFirstName("John");
+        patientW.setLastName("Smith");
+        patientW.setDob(LocalDate.of(1980, 1, 1));
+        patientW.setGender(Gender.MALE);
+        patientW.setEmail("john@test.com");
+        patientW.setPhoneNo("0444444444");
+        Patient w = patientService.createPatient(patientW);
+
+        PatientRequestDTO patientA = new PatientRequestDTO();
+        patientA.setFirstName("John");
+        patientA.setLastName("Smith");
+        patientA.setDob(LocalDate.of(1990, 1, 1));
+        patientA.setGender(Gender.MALE);
+        patientA.setEmail("john@test.com");
+        patientA.setPhoneNo("0433333333");
+        Patient a = patientService.createPatient(patientA);
+
+        Map<UUID, MatchScore> results = patientService.autoMatchPatient(a);
+
+        assertThat(results).hasSize(3);
+        assertThat(results.get(x.getId())).isEqualTo(MatchScore.AUTO_MATCH);
+        assertThat(results.get(w.getId())).isEqualTo(MatchScore.REVIEW);
+        assertThat(results.get(z.getId())).isEqualTo(MatchScore.NO_MATCH);
     }
 }
