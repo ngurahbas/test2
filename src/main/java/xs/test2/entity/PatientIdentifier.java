@@ -8,6 +8,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "patient_identifier", indexes = {
         @Index(name = "idx_patient_id", columnList = "patient_id")
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "uk_patient_id_type_value", columnNames = {"patient_id", "id_type", "id_value"})
 })
 public class PatientIdentifier {
 
