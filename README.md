@@ -19,3 +19,9 @@
 3. Access the application:
    - App: http://localhost:8080
    - Adminer (DB UI): http://localhost:8079
+
+# Tests
+To check integrity of the application:
+```bash
+   ./gradlew clean test
+   ```
