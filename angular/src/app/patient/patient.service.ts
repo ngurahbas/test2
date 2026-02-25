@@ -37,6 +37,17 @@ export interface PatientResponse extends PatientRequest {
   id: string;
 }
 
+export interface IdentifierType {
+  value: string;
+  label: string;
+}
+
+export interface PatientIdentifier {
+  id: string;
+  idType: string;
+  idValue: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -78,5 +89,21 @@ export class PatientService {
 
   updatePatient(id: string, data: PatientRequest): Observable<PatientResponse> {
     return this.http.put<PatientResponse>(`${this.baseUrl}/${id}`, data);
+  }
+
+  getIdentifierTypes(): Observable<IdentifierType[]> {
+    return this.http.get<IdentifierType[]>('/api/enum/identifier-type');
+  }
+
+  getPatientIdentifiers(patientId: string): Observable<PatientIdentifier[]> {
+    return this.http.get<PatientIdentifier[]>(`${this.baseUrl}/${patientId}/identifier`);
+  }
+
+  addPatientIdentifier(patientId: string, data: { idType: string; idValue: string }): Observable<PatientIdentifier> {
+    return this.http.post<PatientIdentifier>(`${this.baseUrl}/${patientId}/identifier`, data);
+  }
+
+  deletePatientIdentifier(patientId: string, identifierId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${patientId}/identifier/${identifierId}`);
   }
 }

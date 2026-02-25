@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, Input, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PatientService, PatientRequest, PatientResponse } from './patient.service';
+import { PatientService, PatientRequest, PatientResponse, IdentifierType, PatientIdentifier } from './patient.service';
 
 @Component({
   selector: 'app-add-patient-dialog',
@@ -115,6 +115,82 @@ import { PatientService, PatientRequest, PatientResponse } from './patient.servi
             </div>
           </div>
 
+          @if (mode() === 'edit') {
+            <div class="border-t pt-4 mt-4">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Identifiers</h3>
+                @if (!showAddIdentifier()) {
+                  <button
+                    type="button"
+                    (click)="showAddIdentifier.set(true)"
+                    class="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    + Add Identifier
+                  </button>
+                }
+              </div>
+
+              @if (identifiers().length > 0) {
+                <div class="space-y-2 mb-3">
+                  @for (identifier of identifiers(); track identifier.id) {
+                    <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                      <div>
+                        <span class="text-xs text-gray-500">{{ getIdentifierTypeLabel(identifier.idType) }}</span>
+                        <div class="text-sm text-gray-800">{{ identifier.idValue }}</div>
+                      </div>
+                      <button
+                        type="button"
+                        (click)="removeIdentifier(identifier.id)"
+                        class="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (showAddIdentifier()) {
+                <div class="bg-gray-50 p-3 rounded space-y-2">
+                  <select
+                    [(ngModel)]="newIdentifier.idType"
+                    name="idType"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select type</option>
+                    @for (type of identifierTypes(); track type.value) {
+                      <option [value]="type.value">{{ type.label }}</option>
+                    }
+                  </select>
+                  <input
+                    type="text"
+                    [(ngModel)]="newIdentifier.idValue"
+                    name="idValue"
+                    placeholder="Identifier value"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      (click)="addIdentifier()"
+                      [disabled]="!newIdentifier.idType || !newIdentifier.idValue || addingIdentifier()"
+                      class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {{ addingIdentifier() ? 'Adding...' : 'Add' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="showAddIdentifier.set(false); newIdentifier = { idType: '', idValue: '' }"
+                      class="px-3 py-1 text-gray-600 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
           @if (error()) {
             <div class="text-red-600 text-sm">{{ error() }}</div>
           }
@@ -153,6 +229,12 @@ export class AddPatientDialogComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
 
+  identifiers = signal<PatientIdentifier[]>([]);
+  identifierTypes = signal<IdentifierType[]>([]);
+  showAddIdentifier = signal(false);
+  addingIdentifier = signal(false);
+  newIdentifier = { idType: '', idValue: '' };
+
   form: PatientRequest = {
     firstName: '',
     lastName: '',
@@ -168,6 +250,10 @@ export class AddPatientDialogComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.patientService.getIdentifierTypes().subscribe({
+      next: (types) => this.identifierTypes.set(types)
+    });
+
     if (this.patientId) {
       this.mode.set('edit');
       this.loading.set(true);
@@ -193,7 +279,40 @@ export class AddPatientDialogComponent implements OnInit {
           this.loading.set(false);
         }
       });
+      this.patientService.getPatientIdentifiers(this.patientId).subscribe({
+        next: (ids) => this.identifiers.set(ids)
+      });
     }
+  }
+
+  getIdentifierTypeLabel(value: string): string {
+    const type = this.identifierTypes().find(t => t.value === value);
+    return type?.label || value;
+  }
+
+  addIdentifier() {
+    if (!this.patientId || !this.newIdentifier.idType || !this.newIdentifier.idValue) return;
+    this.addingIdentifier.set(true);
+    this.patientService.addPatientIdentifier(this.patientId, this.newIdentifier).subscribe({
+      next: (identifier) => {
+        this.identifiers.update(ids => [...ids, identifier]);
+        this.showAddIdentifier.set(false);
+        this.newIdentifier = { idType: '', idValue: '' };
+        this.addingIdentifier.set(false);
+      },
+      error: () => {
+        this.addingIdentifier.set(false);
+      }
+    });
+  }
+
+  removeIdentifier(id: string) {
+    if (!this.patientId) return;
+    this.patientService.deletePatientIdentifier(this.patientId, id).subscribe({
+      next: () => {
+        this.identifiers.update(ids => ids.filter(i => i.id !== id));
+      }
+    });
   }
 
   save() {
