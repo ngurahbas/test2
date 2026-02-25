@@ -28,6 +28,8 @@ entity PatientIdentifier {
     IdValue
     --
     patient_id FK (indexed)
+    --
+    Unique(IdType, IdValue, patient_id)
 }
 
 PatientIdentifier }-- Patient
