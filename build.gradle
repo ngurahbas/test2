@@ -38,9 +38,16 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.register('buildAngular', Exec) {
+tasks.register('npmInstall', Exec) {
     workingDir "${projectDir}/angular"
-    commandLine "bunx", "ng", "build"
+    commandLine "npm", "install"
+    outputs.dir "${projectDir}/angular/node_modules"
+}
+
+tasks.register('buildAngular', Exec) {
+    dependsOn npmInstall
+    workingDir "${projectDir}/angular"
+    commandLine "npx", "ng", "build"
     outputs.dir "${projectDir}/angular/dist/angular/browser"
 }
 
@@ -56,4 +63,6 @@ processResources {
 
 clean {
     delete "${projectDir}/src/main/resources/angular"
+    delete "${projectDir}/angular/dist"
+    delete "${projectDir}/angular/.angular"
 }

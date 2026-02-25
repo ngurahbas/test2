@@ -8,6 +8,6 @@ public class SpaController {
 
     @GetMapping(value = "/{path:[^\\.]*}")
     public String forward() {
-        return "forward:/angular/index.html";
+        return "forward:/index.html";
     }
 }
