@@ -1,5 +1,7 @@
 package xs.test2.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,8 @@ import java.util.UUID;
 
 @Service
 public class PatientService {
+
+    private static final Logger log = LoggerFactory.getLogger(PatientService.class);
 
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
@@ -74,23 +78,40 @@ public class PatientService {
     }
 
     public void autoMatchPatient(Patient patient) {
-//        Iterable<Patient> matchingPatients = patientRepository.getMatchingPatients(patient.getId());
-//        for (Patient matchingPatient : matchingPatients) {
-//            MatchScore score = MatchScore.NO_MATCH;
-//            Set<MatchValue> matchValues = new HashSet<>();
-//
-//            if (Objects.equals(matchingPatient.getFirstName(), patient.getFirstName()) && Objects.equals(matchingPatient.getLastName(), patient.getLastName())) {
-//                matchValues.add(MatchValue.NAME);
-//            }
-//
-//            if (Objects.equals(matchingPatient.getDob(), patient.getDob())) {
-//                matchValues.add(MatchValue.DOB);
-//            }
-//
-//            if (Objects.equals(matchingPatient.getPhoneNo(), patient.getPhoneNo())) {
-//                matchValues.add(MatchValue.PHONE);
-//            }
-//        }
+        Iterable<Patient> matchingPatients = patientRepository.getMatchingPatients(
+                patient.getId(),
+                patient.getFirstName(),
+                patient.getLastName(),
+                patient.getDob(),
+                patient.getEmail(),
+                patient.getPhoneNo());
+        for (Patient matchingPatient : matchingPatients) {
+            MatchScore score = MatchScore.NO_MATCH;
+            Set<MatchValue> matchValues = new HashSet<>();
+
+            if (Objects.equals(matchingPatient.getFirstName(), patient.getFirstName()) && Objects.equals(matchingPatient.getLastName(), patient.getLastName())) {
+                matchValues.add(MatchValue.NAME);
+            }
+
+            if (Objects.equals(matchingPatient.getDob(), patient.getDob())) {
+                matchValues.add(MatchValue.DOB);
+            }
+
+            if (Objects.equals(matchingPatient.getEmail(), patient.getEmail())) {
+                matchValues.add(MatchValue.EMAIL);
+            }
+
+            if (Objects.equals(matchingPatient.getPhoneNo(), patient.getPhoneNo())) {
+                matchValues.add(MatchValue.PHONE);
+            }
+
+            if (matchValues.size() > 2 && matchValues.contains(MatchValue.NAME) && matchValues.contains(MatchValue.DOB)) {
+                score = MatchScore.AUTO_MATCH;
+            } else if (matchValues.size() > 1) {
+                score = MatchScore.REVIEW;
+            }
+            log.info("Patient {} matched with {} ({})", patient.getId(), matchingPatient.getId(), score);
+        }
     }
 
     public Patient getPatientById(UUID id) {

@@ -6,9 +6,7 @@ import xs.test2.shared.IdentifierType;
 import java.util.UUID;
 
 @Entity
-@Table(name = "patient_identifier", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_identifier_type_value", columnNames = {"id_type", "id_value"})
-}, indexes = {
+@Table(name = "patient_identifier", indexes = {
         @Index(name = "idx_patient_id", columnList = "patient_id")
 })
 public class PatientIdentifier {
