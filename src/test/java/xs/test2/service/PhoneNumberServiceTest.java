@@ -50,4 +50,28 @@ class PhoneNumberServiceTest {
     void normalize_withBlank_returnsBlank() {
         assertEquals("   ", phoneNumberService.normalize("   "));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "412345678, +61412345678",
+        "041234567, 041234567"
+    })
+    void normalize_9DigitNumbers_returnsNormalized(String input, String expected) {
+        assertEquals(expected, phoneNumberService.normalize(input));
+    }
+
+    @Test
+    void normalize_noPatternMatch_returnsOriginal() {
+        assertEquals("1234567890", phoneNumberService.normalize("1234567890"));
+    }
+
+    @Test
+    void normalize_withNonDigits_returnsOriginal() {
+        assertEquals("ABC-DEF", phoneNumberService.normalize("ABC-DEF"));
+    }
+
+    @Test
+    void normalize_startsWithCountryCodeNoPlus_returnsNormalized() {
+        assertEquals("+61234567890", phoneNumberService.normalize("61234567890"));
+    }
 }
